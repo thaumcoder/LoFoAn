@@ -21,6 +21,8 @@ public:
 	virtual LogicFormula* getLeft();
 	virtual LogicFormula* getRight();
 
+	bool operator==(LogicFormula& rhs) const;
+
 	virtual ~LogicFormula();
 };
 
@@ -38,6 +40,8 @@ public:
 	bool calculateValue();
 	LogicFormula* toConjunctiveNormalForm();
 	LogicFormula* toDisjunctiveNormalForm();
+
+	bool operator==(PropositionalVariable& rhs) const;
 };
 
 class TrueConstant : public LogicFormula

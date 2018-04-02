@@ -2,7 +2,7 @@
 #include <typeinfo>
 
 
-
+//TODO: tree destruction
 
 
 std::string LogicFormula::toString()
@@ -18,6 +18,17 @@ LogicFormula* LogicFormula::getLeft()
 LogicFormula* LogicFormula::getRight()
 {
 	return rightOperand;
+}
+
+bool LogicFormula::operator==(LogicFormula& rhs) const
+{
+	if (typeid(*this) != typeid(rhs)) return false;
+
+	if (leftOperand == nullptr ^ rhs.leftOperand == nullptr) return false;
+	if (rightOperand == nullptr ^ rhs.rightOperand == nullptr) return false;
+	if (leftOperand == nullptr && rightOperand == nullptr) return true;
+
+	return (*leftOperand == *rhs.leftOperand && *rightOperand == *rhs.rightOperand);
 }
 
 
@@ -62,6 +73,10 @@ LogicFormula* PropositionalVariable::toDisjunctiveNormalForm()
 	return this;
 }
 
+bool PropositionalVariable::operator==(PropositionalVariable& rhs) const
+{
+	return this->name == rhs.name;
+}
 
 
 
@@ -164,9 +179,25 @@ LogicFormula* NotFormula::getRight()
 
 LogicFormula* NotFormula::simplify()
 {
-	if (typeid(rightOperand) == typeid(this))
+	if (typeid(*rightOperand) == typeid(*this))
 	{
 		return rightOperand->getRight.simplify();
+	}
+	if (typeid(*rightOperand) == typeid(AndFormula))
+	{
+		LogicFormula* left = rightOperand->getLeft();
+		LogicFormula* right = rightOperand->getRight();
+		LogicFormula* result = new OrFormula(new NotFormula(left), new NotFormula(right));
+		result->simplify();
+		return result;
+	}
+	if (typeid(*rightOperand) == typeid(OrFormula))
+	{
+		LogicFormula* left = rightOperand->getLeft();
+		LogicFormula* right = rightOperand->getRight();
+		LogicFormula* result = new AndFormula(new NotFormula(left), new NotFormula(right));
+		result->simplify();
+		return result;
 	}
 	else
 	{
