@@ -124,6 +124,16 @@ public:
 	LogicFormula* toDisjunctiveNormalForm();
 };
 
+class NorFormula : public LogicFormula
+{
+public:
+	NorFormula(LogicFormula* leftOp, LogicFormula* rightOp);
+	LogicFormula* simplify();
+	bool calculateValue();
+	LogicFormula* toConjunctiveNormalForm();
+	LogicFormula* toDisjunctiveNormalForm();
+};
+
 class EquFormula : public LogicFormula
 {
 public:

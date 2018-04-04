@@ -3,6 +3,8 @@
 
 
 //TODO: tree destruction
+//TODO: implement toConjunctiveNormalForm()
+//TODO: implement toDisjunctiveNormalForm()
 
 
 std::string LogicFormula::toString()
@@ -232,9 +234,435 @@ AndFormula::AndFormula(LogicFormula* leftOp, LogicFormula* rightOp)
 
 LogicFormula* AndFormula::simplify()
 {
+	if (typeid(*leftOperand) == typeid(TrueConstant))
+	{
+		if (typeid(*rightOperand) == typeid(TrueConstant))
+		{
+			return new TrueConstant();
+		}
+		else
+		{
+			return rightOperand;
+		}
+	}
+	if (typeid(*rightOperand) == typeid(TrueConstant))
+	{
+		return leftOperand;
+	}
 
+	if (typeid(*leftOperand) == typeid(FalseConstant) || typeid(*rightOperand) == typeid(FalseConstant))
+	{
+		return new FalseConstant();
+	}
+
+	return this;
 }
 
-bool calculateValue();
-LogicFormula* toConjunctiveNormalForm();
-LogicFormula* toDisjunctiveNormalForm();
+bool AndFormula::calculateValue()
+{
+	return leftOperand->calculateValue() && rightOperand->calculateValue();
+}
+LogicFormula* AndFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+LogicFormula* AndFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+
+
+
+OrFormula::OrFormula(LogicFormula* leftOp, LogicFormula* rightOp)
+{
+	leftOperand = leftOp;
+	rightOperand = rightOp;
+}
+
+LogicFormula* OrFormula::simplify()
+{
+	if (typeid(*leftOperand) == typeid(FalseConstant))
+	{
+		if (typeid(*rightOperand) == typeid(FalseConstant))
+		{
+			return new FalseConstant();
+		}
+		else
+		{
+			return rightOperand;
+		}
+	}
+	if (typeid(*rightOperand) == typeid(FalseConstant))
+	{
+		return leftOperand;
+	}
+
+	if (typeid(*leftOperand) == typeid(TrueConstant) || typeid(*rightOperand) == typeid(TrueConstant))
+	{
+		return new TrueConstant();
+	}
+
+	return this;
+}
+
+bool OrFormula::calculateValue()
+{
+	return leftOperand->calculateValue() || rightOperand->calculateValue();
+}
+
+LogicFormula* OrFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+LogicFormula* OrFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+
+
+
+XorFormula::XorFormula(LogicFormula* leftOp, LogicFormula* rightOp)
+{
+	leftOperand = leftOp;
+	rightOperand = rightOp;
+}
+
+LogicFormula* XorFormula::simplify()
+{
+	if (typeid(*leftOperand) == typeid(TrueConstant) && typeid(*rightOperand) == typeid(TrueConstant))
+	{
+		return new FalseConstant();
+	}
+	if (typeid(*leftOperand) == typeid(FalseConstant) && typeid(*rightOperand) == typeid(FalseConstant))
+	{
+		return new FalseConstant();
+	}
+
+	if (typeid(*leftOperand) == typeid(TrueConstant) || typeid(*leftOperand) == typeid(FalseConstant))
+	{
+		return rightOperand;
+	}
+	if (typeid(*rightOperand) == typeid(TrueConstant) || typeid(*rightOperand) == typeid(FalseConstant))
+	{
+		return leftOperand;
+	}
+
+	return this;
+}
+
+bool XorFormula::calculateValue()
+{
+	return leftOperand->calculateValue() ^ rightOperand->calculateValue();
+}
+
+LogicFormula* XorFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+LogicFormula* XorFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+
+
+
+NandFormula::NandFormula(LogicFormula* leftOp, LogicFormula* rightOp)
+{
+	leftOperand = leftOp;
+	rightOperand = rightOp;
+}
+
+LogicFormula* NandFormula::simplify()
+{
+	if (typeid(*leftOperand) == typeid(TrueConstant))
+	{
+		if (typeid(*rightOperand) == typeid(TrueConstant))
+		{
+			return new FalseConstant();
+		}
+		else
+		{
+			return new NotFormula(rightOperand);
+		}
+	}
+	if (typeid(*rightOperand) == typeid(TrueConstant))
+	{
+		return new NotFormula(leftOperand);
+	}
+
+	if (typeid(*leftOperand) == typeid(FalseConstant) || typeid(*rightOperand) == typeid(FalseConstant))
+	{
+		return new TrueConstant();
+	}
+
+	return this;
+}
+
+bool NandFormula::calculateValue()
+{
+	return !(leftOperand->calculateValue() && rightOperand->calculateValue());
+}
+
+LogicFormula* NandFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+LogicFormula* NandFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+
+
+
+NorFormula::NorFormula(LogicFormula* leftOp, LogicFormula* rightOp)
+{
+	leftOperand = leftOp;
+	rightOperand = rightOp;
+}
+
+LogicFormula* NorFormula::simplify()
+{
+	if (typeid(*leftOperand) == typeid(FalseConstant))
+	{
+		if (typeid(*rightOperand) == typeid(FalseConstant))
+		{
+			return new TrueConstant();
+		}
+		else
+		{
+			return new NotFormula(rightOperand);
+		}
+	}
+	if (typeid(*rightOperand) == typeid(FalseConstant))
+	{
+		return new NotFormula(leftOperand);
+	}
+
+	if (typeid(*leftOperand) == typeid(TrueConstant) || typeid(*rightOperand) == typeid(TrueConstant))
+	{
+		return new FalseConstant();
+	}
+
+	return this;
+}
+bool NorFormula::calculateValue()
+{
+	return !(leftOperand->calculateValue() || rightOperand->calculateValue());
+}
+LogicFormula* NorFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+LogicFormula* NorFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+
+
+
+EquFormula::EquFormula(LogicFormula* leftOp, LogicFormula* rightOp)
+{
+	leftOperand = leftOp;
+	rightOperand = rightOp;
+}
+
+LogicFormula* EquFormula::simplify()
+{
+	if (typeid(*leftOperand) == typeid(TrueConstant) && typeid(*rightOperand) == typeid(TrueConstant)) return new TrueConstant();
+	if (typeid(*leftOperand) == typeid(FalseConstant) && typeid(*rightOperand) == typeid(FalseConstant)) return new TrueConstant();
+
+	if (typeid(*leftOperand) == typeid(TrueConstant) || typeid(*leftOperand) == typeid(TrueConstant)) return  rightOperand;
+	if (typeid(*rightOperand) == typeid(TrueConstant) || typeid(*rightOperand) == typeid(TrueConstant)) return  leftOperand;
+
+	return this;
+}
+
+bool EquFormula::calculateValue()
+{
+	return leftOperand->calculateValue() == rightOperand->calculateValue();
+}
+
+LogicFormula* EquFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+LogicFormula* EquFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+ImplFormula::ImplFormula(LogicFormula* leftOp, LogicFormula* rightOp)
+{
+	leftOperand = leftOp;
+	rightOperand = rightOp;
+}
+
+LogicFormula* ImplFormula::simplify()
+{
+	if (typeid(*rightOperand) == typeid(FalseConstant))
+	{
+		if (typeid(*leftOperand) == typeid(FalseConstant)) return new TrueConstant();
+		if (typeid(*leftOperand) == typeid(TrueConstant)) return new FalseConstant();
+	}
+	else if (typeid(*rightOperand) == typeid(TrueConstant))
+	{
+		return new TrueConstant();
+	}
+
+	if (typeid(*leftOperand) == typeid(FalseConstant)) return new TrueConstant();
+	if (typeid(*leftOperand) == typeid(TrueConstant)) return rightOperand;
+
+	return this;
+}
+
+bool ImplFormula::calculateValue()
+{
+	bool leftVal = leftOperand->calculateValue();
+	if (leftVal == false) return true;
+
+	return rightOperand->calculateValue();
+}
+
+LogicFormula* ImplFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+LogicFormula* ImplFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+
+
+
+RevimplFormula::RevimplFormula(LogicFormula* leftOp, LogicFormula* rightOp)
+{
+	leftOperand = leftOp;
+	rightOperand = rightOp;
+}
+
+LogicFormula* RevimplFormula::simplify()
+{
+	if (typeid(*leftOperand) == typeid(FalseConstant))
+	{
+		if (typeid(*rightOperand) == typeid(FalseConstant)) return new TrueConstant();
+		if (typeid(*rightOperand) == typeid(TrueConstant)) return new FalseConstant();
+	}
+	else if (typeid(*leftOperand) == typeid(TrueConstant))
+	{
+		return new TrueConstant();
+	}
+
+	if (typeid(*rightOperand) == typeid(FalseConstant)) return new TrueConstant();
+	if (typeid(*rightOperand) == typeid(TrueConstant)) return leftOperand;
+
+	return this;
+}
+
+bool RevimplFormula::calculateValue()
+{
+	bool rightVal = rightOperand->calculateValue();
+	if (rightVal == false) return true;
+
+	return leftOperand->calculateValue();
+}
+LogicFormula* RevimplFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+LogicFormula* RevimplFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+
+
+
+NeqFormula::NeqFormula(LogicFormula* leftOp, LogicFormula* rightOp)
+{
+	leftOperand = leftOp;
+	rightOperand = rightOp;
+}
+
+LogicFormula* NeqFormula::simplify()
+{
+	if (typeid(*leftOperand) == typeid(TrueConstant) && typeid(*rightOperand) == typeid(TrueConstant)) return new FalseConstant();
+	if (typeid(*leftOperand) == typeid(FalseConstant) && typeid(*rightOperand) == typeid(FalseConstant)) return new FalseConstant();
+
+	if (typeid(*leftOperand) == typeid(TrueConstant) || typeid(*leftOperand) == typeid(TrueConstant)) return  new NotFormula(rightOperand);
+	if (typeid(*rightOperand) == typeid(TrueConstant) || typeid(*rightOperand) == typeid(TrueConstant)) return  new NotFormula(leftOperand);
+
+	return this;
+}
+
+bool NeqFormula::calculateValue()
+{
+	return !(leftOperand->calculateValue() == rightOperand->calculateValue());
+}
+
+LogicFormula* NeqFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+LogicFormula* NeqFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+
+
+
+NimplFormula::NimplFormula(LogicFormula* leftOp, LogicFormula* rightOp)
+{
+	leftOperand = leftOp;
+	rightOperand = rightOp;
+}
+
+LogicFormula* NimplFormula::simplify()
+{
+	if (typeid(*rightOperand) == typeid(FalseConstant))
+	{
+		if (typeid(*leftOperand) == typeid(FalseConstant)) return new FalseConstant();
+		if (typeid(*leftOperand) == typeid(TrueConstant)) return new TrueConstant();
+	}
+	else if (typeid(*rightOperand) == typeid(TrueConstant))
+	{
+		return new FalseConstant();
+	}
+
+	if (typeid(*leftOperand) == typeid(FalseConstant)) return new TrueConstant();
+	if (typeid(*leftOperand) == typeid(TrueConstant)) return new NotFormula(rightOperand);
+
+	return this;
+}
+
+bool NimplFormula::calculateValue()
+{
+	bool leftVal = leftOperand->calculateValue();
+	if (leftVal == false) return false;
+
+	return !rightOperand->calculateValue();
+}
+
+LogicFormula* NimplFormula::toConjunctiveNormalForm()
+{
+	return nullptr;
+}
+
+LogicFormula* NimplFormula::toDisjunctiveNormalForm()
+{
+	return nullptr;
+}
